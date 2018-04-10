@@ -27,3 +27,9 @@ file { "/etc/nginx/server.crt":
     source => "file:///tmp/cloudformation/puppet/files/server.crt",
     notify => Service["nginx"]
 }
+
+file{ "/usr/share/nginx/html/index.html":
+    ensure => present,
+    source => "/var/lib/cloud/data/instance-id",
+
+}

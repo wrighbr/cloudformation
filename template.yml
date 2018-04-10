@@ -61,7 +61,7 @@ Resources:
   WebInstance1: 
     Type: "AWS::EC2::Instance"
     Properties: 
-      ImageId: "ami-b6bb47d4"
+      ImageId: "ami-d38a4ab1"
       KeyName: "automation"
       InstanceType: t2.nano
       SecurityGroupIds:
@@ -72,13 +72,17 @@ Resources:
           DeviceName: "/dev/sda1"
           Ebs:
             VolumeSize: 8
-      UserData:
-        Fn::Base64:
-          yum update -y
-          rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
-          yum install -y puppet git
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo su
+          curl -O https://apt.puppetlabs.com/puppet-release-xenial.deb
+          dpkg -i puppet-release-xenial.deb
+          apt-get update -y
+          apt-get install -y puppet git
           git clone https://github.com/wrighbr/cloudformation.git /tmp/cloudformation
           puppet apply /tmp/cloudformation/puppet/nginx.pp
+          #Ref: WebInstance1 > /home/ubunutu/ec2instance
           
       Tags: 
         - 
