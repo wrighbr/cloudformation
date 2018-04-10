@@ -16,6 +16,32 @@ Resources:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
 
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  DefaultPublicRoute: 
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties: 
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -38,8 +64,9 @@ Resources:
       ImageId: "ami-b6bb47d4"
       KeyName: "automation"
       InstanceType: t2.nano
-      SecurityGroups:
+      SecurityGroupIds:
         - !Ref WebSecurityGroup
+      SubnetId: !Ref PublicSubnet1
       BlockDeviceMappings:
         - 
           DeviceName: "/dev/sda1"
@@ -49,8 +76,10 @@ Resources:
         Fn::Base64:
           yum update -y
           rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
-          yum install -y puppet
-
+          yum install -y puppet git
+          git clone https://github.com/wrighbr/cloudformation.git
+          puppet apply ~/cloudformation/nginx.pp
+          
       Tags: 
         - 
           Key: Name
@@ -59,7 +88,7 @@ Resources:
           Key: CloudFormation
           Value: True
   
-  WeSecurityGroup:
+  WebSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       VpcId: !Ref VPC
@@ -86,3 +115,28 @@ Resources:
         CidrIp: 0.0.0.0/0
 
 
+  ElasticLoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      Subnets:
+      - !Ref PublicSubnet1
+      - !Ref PublicSubnet2
+      Instances:
+      - !Ref WebInstance1
+      Listeners:
+      - LoadBalancerPort: 80
+        InstancePort: 80
+        Protocol: HTTP
+
+      - LoadBalancerPort: 443
+        InstancePort: 443
+        Protocol: HTTPS
+        SSLCertificateId: arn:aws:acm:ap-southeast-2:123053101016:certificate/c2906e1f-4d4d-4c4a-9681-26e674a79ac7
+      
+      #HealthCheck:
+      #  Target: HTTP:80/
+      #  HealthyThreshold: '3'
+      #  UnhealthyThreshold: '5'
+      #  Interval: '30'
+      #  Timeout: '5'
+  
