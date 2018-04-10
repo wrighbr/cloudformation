@@ -12,18 +12,18 @@ $files = ['nginx.conf', 'server.key', 'server.crt']
 
 file { "/etc/nginx/nginx.conf":
     ensure => present,
-    source => "file:///~/cloudformation/puppet/files/nginx.conf",
+    source => "file:///tmp/cloudformation/puppet/files/nginx.conf",
     notify => Service["nginx"]
 }
 
 file { "/etc/nginx/server.key":
     ensure => present,
-    source => "file:///~/cloudformation/puppet/files/server.key",
+    source => "file:///tmp/cloudformation/puppet/files/server.key",
     notify => Service["nginx"]
 }
 
 file { "/etc/nginx/server.crt":
     ensure => present,
-    source => "file:///~/cloudformation/puppet/files/server.crt",
+    source => "file:///tmp/cloudformation/puppet/files/server.crt",
     notify => Service["nginx"]
 }
