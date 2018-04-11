@@ -29,8 +29,16 @@ file { "/etc/nginx/server.crt":
     notify => Service["nginx"]
 }
 
+
 file{ "/usr/share/nginx/html/index.html":
     ensure => present,
     source => "/var/lib/cloud/data/instance-id",
+    require => Package["nginx"],
+}
+
+
+file{ "/usr/share/nginx/html/404.html":
+    ensure => present,
+    source => "file:///tmp/cloudformation/puppet/files/404.html",
     require => Package["nginx"],
 }

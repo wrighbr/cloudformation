@@ -152,6 +152,8 @@ Resources:
   ElasticLoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
+      SecurityGroups: 
+      - !Ref WebSecurityGroup
       Subnets:
       - !Ref PublicSubnet1
       - !Ref PublicSubnet2
@@ -162,16 +164,27 @@ Resources:
       - LoadBalancerPort: 80
         InstancePort: 80
         Protocol: HTTP
+        InstanceProtocol: HTTPS
 
       - LoadBalancerPort: 443
         InstancePort: 443
         Protocol: HTTPS
+        InstanceProtocol: HTTPS
         SSLCertificateId: arn:aws:acm:ap-southeast-2:123053101016:certificate/c2906e1f-4d4d-4c4a-9681-26e674a79ac7
       
-      #HealthCheck:
-      #  Target: HTTP:80/
-      #  HealthyThreshold: '3'
-      #  UnhealthyThreshold: '5'
-      #  Interval: '30'
-      #  Timeout: '5'
+      HealthCheck:
+        Target: HTTPS:443/index.html
+        HealthyThreshold: '3'
+        UnhealthyThreshold: '5'
+        Interval: '30'
+        Timeout: '5'
   
+  myDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: btwsolutions.net.
+      Name: stan.btwsolutions.net.
+      Type: CNAME
+      TTL: 60
+      ResourceRecords:
+      - !GetAtt ElasticLoadBalancer.DNSName
