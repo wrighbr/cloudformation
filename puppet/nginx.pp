@@ -27,6 +27,6 @@ file{ "/usr/share/nginx/html/index.html":
 file{ "/usr/share/nginx/html/":
     ensure => directory,
     recurse => true,
-    source => "file:///tmp/cloudformation/puppet/files/error/",
+    source => "file:///tmp/cloudformation/puppet/files/errors/",
     require => Package["nginx"],
 }
