@@ -8,8 +8,6 @@ service { "nginx":
     enable => true
 }
 
-$files = ['nginx.conf', 'server.key', 'server.crt']
-
 file { "/etc/nginx/nginx.conf":
     ensure => present,
     source => "file:///tmp/cloudformation/puppet/files/nginx.conf",
@@ -31,5 +29,5 @@ file { "/etc/nginx/server.crt":
 file{ "/usr/share/nginx/html/index.html":
     ensure => present,
     source => "/var/lib/cloud/data/instance-id",
-
+    require => Package["nginx"],
 }

@@ -81,7 +81,7 @@ Resources:
           apt-get update -y
           apt-get install -y puppet git
           git clone https://github.com/wrighbr/cloudformation.git /tmp/cloudformation
-          puppet apply /tmp/cloudformation/puppet/nginx.pp
+          sudo puppet apply /tmp/cloudformation/puppet/nginx.pp
           #Ref: WebInstance1 > /home/ubunutu/ec2instance
           
       Tags: 
