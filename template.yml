@@ -82,8 +82,6 @@ Resources:
           apt-get install -y puppet git
           git clone https://github.com/wrighbr/cloudformation.git /tmp/cloudformation
           sudo puppet apply /tmp/cloudformation/puppet/nginx.pp
-          #Ref: WebInstance1 > /home/ubunutu/ec2instance
-          
       Tags: 
         - 
           Key: Name
@@ -92,6 +90,38 @@ Resources:
           Key: CloudFormation
           Value: True
   
+  WebInstance2: 
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: "ami-d38a4ab1"
+      KeyName: "automation"
+      InstanceType: t2.nano
+      SecurityGroupIds:
+        - !Ref WebSecurityGroup
+      SubnetId: !Ref PublicSubnet2
+      BlockDeviceMappings:
+        - 
+          DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: 8
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo su
+          curl -O https://apt.puppetlabs.com/puppet-release-xenial.deb
+          dpkg -i puppet-release-xenial.deb
+          apt-get update -y
+          apt-get install -y puppet git
+          git clone https://github.com/wrighbr/cloudformation.git /tmp/cloudformation
+          sudo puppet apply /tmp/cloudformation/puppet/nginx.pp
+      Tags: 
+        - 
+          Key: Name
+          Value: web2
+        - 
+          Key: CloudFormation
+          Value: True
+
   WebSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -127,6 +157,7 @@ Resources:
       - !Ref PublicSubnet2
       Instances:
       - !Ref WebInstance1
+      - !Ref WebInstance2      
       Listeners:
       - LoadBalancerPort: 80
         InstancePort: 80
