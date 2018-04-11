@@ -9,40 +9,13 @@ service { "nginx":
 }
 
 
-$files = [ 'nginx.conf', 'server.key', 'server.crt' ]
-
-
-file { "/etc/nginx/${files}":
+file { "/etc/nginx/":
     require => Package["nginx"],
-    ensure => present,
-    source => "file:///tmp/cloudformation/puppet/files/${files}",
+    ensure => directory,
+    recurse => true,
+    source => "file:///tmp/cloudformation/puppet/files/nginx/",
     notify => Service["nginx"]
 }
-
-
-#file { "/etc/nginx/nginx.conf":
-#    require => Package["nginx"],
-#    ensure => present,
-#    source => "file:///tmp/cloudformation/puppet/files/nginx.conf",
-#    notify => Service["nginx"]
-#}
-
-#file { "/etc/nginx/server.key":
-#    require => Package["nginx"],
-#    ensure => present,
-#    source => "file:///tmp/cloudformation/puppet/files/server.key",
-#    notify => Service["nginx"]
-#}
-
-#file { "/etc/nginx/server.crt":
-#    require => Package["nginx"],
-#    ensure => present,
-#    source => "file:///tmp/cloudformation/puppet/files/server.crt",
-#    notify => Service["nginx"]
-#}
-
-
-
 
 file{ "/usr/share/nginx/html/index.html":
     ensure => present,
@@ -51,8 +24,9 @@ file{ "/usr/share/nginx/html/index.html":
 }
 
 
-file{ "/usr/share/nginx/html/404.html":
-    ensure => present,
-    source => "file:///tmp/cloudformation/puppet/files/404.html",
+file{ "/usr/share/nginx/html/":
+    ensure => directory,
+    recurse => true,
+    source => "file:///tmp/cloudformation/puppet/files/error/",
     require => Package["nginx"],
 }
